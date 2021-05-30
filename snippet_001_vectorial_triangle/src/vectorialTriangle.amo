@@ -1,0 +1,32 @@
+' Flat shadow rotating Y triangle by Aghnar/Agima in dec. 2019 
+Screen Open 0,320,256,8,Lowres
+Flash Off : Curs Off : Hide : Degree 
+Paper 0 : Cls : Palette $0,$666,$888,$BBB,$AAA,$BBB,$CCC,$EEE
+Pen 2
+Double Buffer : Autoback 0
+Blitter Copy Limit 0,48 To 320,208
+
+Dim C(359),S(359) : For I=0 To 359 : C(I)=256*Cos(I) : S(I)=256*Sin(I) : Next 
+X1=64 : Y1=-32 : Z1=0 : X2=-64 : Y2=-32 : Z2=0 : X3=0 : Y3=74 : Z3=0
+XE1=0 : YE1=0 : XE2=0 : YE2=0 : XE3=0 : YE3=0
+X=0 : Y=0 : Z=0 : T=0 : Timer=0
+
+Do 
+ Blitter Copy 0,1 To 0,2
+ Blitter Copy 0,0 To 0,1
+ Add T,1 : If T=10 : Locate 1,26 : Print 500/Timer;" FPS" : Timer=0 : T=0 : End If 
+ Add A,-2,0 To 359
+ X=X1*C(A)+Z1*S(A) : Y=Y1*256 : Z=-X1*S(A)+Z1*C(A) : CZ=Z+256*256
+ Blitter Clear 0,0
+ XE1=160+(X*256)/CZ : YE1=100+(Y*256)/CZ
+ X=X2*C(A)+Z2*S(A) : Y=Y2*256 : Z=-X2*S(A)+Z2*C(A) : CZ=Z+256*256
+ XE2=160+(X*256)/CZ : YE2=100+(Y*256)/CZ
+ X=X3*C(A)+Z3*S(A) : Y=Y3*256 : Z=-X3*S(A)+Z3*C(A) : CZ=Z+256*256
+ XE3=160+(X*256)/CZ : YE3=100+(Y*256)/CZ
+ Turbo Draw XE1,YE1 To XE2,YE2,1,-1
+ Turbo Draw XE2,YE2 To XE3,YE3,1,-1
+ Turbo Draw XE3,YE3 To XE1,YE1,1,-1
+ Blitter Fill 0,0
+ Screen Swap : Wait Vbl 
+Loop 
+
