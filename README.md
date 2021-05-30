@@ -9,5 +9,5 @@ All the code examples in the repository assume that these two extensions are ins
 
 Unless otherwise stated, the repository programs are written for a (almost) vanilla Amga 500 with 512KB of chip memory and 512KB of memory.
 
-Amos programs are not in plain text : they can contains data sets called "Amos banks".
+Amos programs are not in plain text : they can contain data sets called "Amos banks".
 A program in Amos format (.amos extension) and a full text version (without any banks) will be provided for each example.
