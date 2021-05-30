@@ -1,0 +1,155 @@
+' Simple rotating flat star
+' From the demo HAPPY NEW YEAR 2021/AGIMA Dec 2020
+' A reworked to be standalone
+
+' Aghnar may 21
+
+Set Buffer 32
+
+Dim C(1024),S(1024)
+
+Global NDP,C(),S()
+Global CX,CY,ANG
+Global T
+Global X1,Y1,X2,Y2,X3,Y3,X4,Y4,X5,Y5
+Global X6,Y6,X7,Y7,X8,Y8,X9,Y9,X0,Y0
+Global XE1,YE1,XE2,YE2,XE3,YE3,XE4,YE4,XE5,YE5
+Global XE6,YE6,XE7,YE7,XE8,YE8,XE9,YE9,XE0,YE0
+
+Degree 
+
+For I=0 To 1023
+   ANG=I : Rem ((1024*I)/360) avec i (0,359)
+   C(I)=Qcos(ANG,256) : S(I)=Qsin(ANG,256)
+Next I
+
+Screen Open 0,320,256,4,Lowres
+Flash Off : Curs Off : Hide On 
+Palette $214,$519,$103,$519
+Paper 0 : Cls 0 : Pen 1 : Ink 1
+
+Double Buffer : Autoback 0
+
+ANG=0
+CX=160 : CY=128
+
+' Definition of the star 
+NDP=10
+Palette $214,$519,$103,$519
+
+X0=170 : Y0=0
+X1=69 : Y1=49
+X2=52 : Y2=162
+X3=-26 : Y3=81
+X4=-138 : Y4=99
+X5=-85 : Y5=0
+X6=-137 : Y6=-100
+X7=-26 : Y7=-81
+X8=53 : Y8=-162
+X9=69 : Y9=-49
+
+CX=160
+CY=128
+
+Repeat 
+   
+   Blitter Clear 0,0,64,30-128+CY To 256,224-128+CY
+   Blitter Clear 0,1,64,30-128+CY To 256,224-128+CY
+   
+   Add ANG,1,0 To 1023
+   CA=C(ANG)
+   SA=S(ANG)
+   
+   XE0=X0*CA-Y0*SA
+   YE0=X0*SA+Y0*CA
+   XE0=CX+XE0/512
+   YE0=CY+YE0/512
+   
+   XE1=X1*CA-Y1*SA
+   YE1=X1*SA+Y1*CA
+   XE1=CX+XE1/512
+   YE1=CY+YE1/512
+   
+   XE2=X2*CA-Y2*SA
+   YE2=X2*SA+Y2*CA
+   XE2=CX+XE2/512
+   YE2=CY+YE2/512
+   
+   XE3=X3*CA-Y3*SA
+   YE3=X3*SA+Y3*CA
+   XE3=CX+XE3/512
+   YE3=CY+YE3/512
+   
+   XE4=X4*CA-Y4*SA
+   YE4=X4*SA+Y4*CA
+   XE4=CX+XE4/512
+   YE4=CY+YE4/512
+   
+   XE5=X5*CA-Y5*SA
+   YE5=X5*SA+Y5*CA
+   XE5=CX+XE5/512
+   YE5=CY+YE5/512
+   
+   XE6=X6*CA-Y6*SA
+   YE6=X6*SA+Y6*CA
+   XE6=CX+XE6/512
+   YE6=CY+YE6/512
+   
+   XE7=X7*CA-Y7*SA
+   YE7=X7*SA+Y7*CA
+   XE7=CX+XE7/512
+   YE7=CY+YE7/512
+   
+   XE8=X8*CA-Y8*SA
+   YE8=X8*SA+Y8*CA
+   XE8=CX+XE8/512
+   YE8=CY+YE8/512
+   
+   XE9=X9*CA-Y9*SA
+   YE9=X9*SA+Y9*CA
+   XE9=CX+XE9/512
+   YE9=CY+YE9/512
+   
+   Turbo Draw XE0,YE0 To XE1,YE1,1,-1
+   Turbo Draw XE1,YE1 To XE2,YE2,1,-1
+   Turbo Draw XE2,YE2 To XE3,YE3,1,-1
+   Turbo Draw XE3,YE3 To XE4,YE4,1,-1
+   Turbo Draw XE4,YE4 To XE5,YE5,1,-1
+   Turbo Draw XE5,YE5 To XE6,YE6,1,-1
+   Turbo Draw XE6,YE6 To XE7,YE7,1,-1
+   Turbo Draw XE7,YE7 To XE8,YE8,1,-1
+   Turbo Draw XE8,YE8 To XE9,YE9,1,-1
+   Turbo Draw XE9,YE9 To XE0,YE0,1,-1
+   
+   Blitter Fill 0,0,64,30-128+CY,256,220-128+CY
+   
+   ' simple shadow made with a translation
+   
+   XE0=XE0+8 : YE0=YE0+8
+   XE1=XE1+8 : YE1=YE1+8
+   XE2=XE2+8 : YE2=YE2+8
+   XE3=XE3+8 : YE3=YE3+8
+   XE4=XE4+8 : YE4=YE4+8
+   XE5=XE5+8 : YE5=YE5+8
+   XE6=XE6+8 : YE6=YE6+8
+   XE7=XE7+8 : YE7=YE7+8
+   XE8=XE8+8 : YE8=YE8+8
+   XE9=XE9+8 : YE9=YE9+8
+   
+   Turbo Draw XE0,YE0 To XE1,YE1,2,-2
+   Turbo Draw XE1,YE1 To XE2,YE2,2,-2
+   Turbo Draw XE2,YE2 To XE3,YE3,2,-2
+   Turbo Draw XE3,YE3 To XE4,YE4,2,-2
+   Turbo Draw XE4,YE4 To XE5,YE5,2,-2
+   Turbo Draw XE5,YE5 To XE6,YE6,2,-2
+   Turbo Draw XE6,YE6 To XE7,YE7,2,-2
+   Turbo Draw XE7,YE7 To XE8,YE8,2,-2
+   Turbo Draw XE8,YE8 To XE9,YE9,2,-2
+   Turbo Draw XE9,YE9 To XE0,YE0,2,-2
+   
+   Blitter Fill 0,1,64,30-128+CY,256,220-128+CY
+   
+   Screen Swap 
+   Wait Vbl 
+   
+Until Mouse Key=1
