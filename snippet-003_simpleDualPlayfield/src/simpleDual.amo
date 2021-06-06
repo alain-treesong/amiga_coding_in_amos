@@ -1,0 +1,26 @@
+' Simple Dual Playfied horizontal scrolling
+Screen Open 0,256*2,192,8,Lowres
+Screen Display 0,160,72,256,192
+Flash Off : Curs Off : Hide On : Paper 0 : Cls 
+Load Iff "assets/background.iff"
+Screen Copy 0,0,0,256,192 To 0,256,0
+Wait Vbl : Rem wait vbl necessary to let amos computing everything
+
+Screen Open 1,256*3,192,8,Lowres
+Screen Display 1,160,72,256,192
+Flash Off : Curs Off : Paper 0 : Cls 
+Load Iff "assets/foreground.iff"
+Screen Copy 1,0,0,256,192 To 1,512,0
+
+Dual Playfield 1,0
+Palette ,,,,,,,,,$69B,$47A,$47D,$259,$36C,$26B,$37B
+
+Do 
+   Add X0,1,0 To 255
+   Add X1,2,0 To 511
+   Screen Offset 0,X0,
+   Screen Offset 1,X1,
+   Wait Vbl 
+Loop 
+
+
