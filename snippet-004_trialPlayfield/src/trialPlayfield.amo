@@ -1,0 +1,79 @@
+' Trial playfield at 50 Fps on Amiga 500 
+' Aghnar / Agima june 21 
+
+Screen Open 0,320,256,8,Lowres
+Screen Display 0,160,72,256,192
+Flash Off : Curs Off : Hide On : Paper 0 : Cls 
+
+' Prepare the farthest field 
+' 16 sinusoidally distored images grabbed as bob 
+' This part of code is not specially efficient : a simple example
+' to animate the back field
+Load Iff "assets/far.iff"
+Dim C(1023)
+For I=0 To 1023 : C(I)=Qcos(I,256) : Next I
+For I=1 To 16
+   Add A,64,0 To 1023
+   A1=A
+   For Y=32 To 112
+      Add A1,8,0 To 1023
+      CA=C(A1)/128
+      Screen Copy 0,0,Y,310,Y+1 To 0,CA,Y+112-32
+      Get Bob I,0,112 To 256,192
+   Next 
+Next 
+
+' The main scene : dual playfield screens
+' See snippet 3 to get some details
+Screen Open 0,256*2,192,8,Lowres
+Screen Display 0,160,72,256,192
+Flash Off : Curs Off : Hide On : Paper 0 : Cls 
+Load Iff "assets/background.iff"
+Screen Copy 0,0,0,256,192 To 0,256,0
+Wait Vbl : Rem wait vbl necessary to let amos computing everything
+
+Screen Open 1,256*3,192,8,Lowres
+Screen Display 1,160,72,256,192
+Flash Off : Curs Off : Paper 0 : Cls 
+Load Iff "assets/foreground.iff"
+Screen Copy 1,0,0,256,192 To 1,512,0
+
+Dual Playfield 1,0
+Palette ,,,,,,,,,$69B,$47A,$47D,$259,$36C,$26B,$37B
+
+
+' Builds the animation in the back field. The double buffer of the 
+' back screen is necessary to have neat animation. 
+Screen 0
+Double Buffer 
+' The "trick" is here associated with "set bob" and the choice of the  
+' colours in palette.  
+' The third parameter "%100" means that the bob is only displayed  
+' on the 3rd bitplane of the second dual 8 colors screen.  
+' The second parameter "0" (default value) means that the original 
+' graphics are restored at each move of the bob. 
+' The part of the scenery where the bob is located has specific colors : 
+' only color 3,4,5,6 and 7. Pixels of the bob that are not transparent   
+' has the last third bit set. In this case, the colors 4,5,6 and 7 
+' of the scenery are unchanged because they have already the 3rd bit to 1. 
+' It gives the illusion that the bob remains behind the scenery. 
+' When the color of the scenery is 3 (the quite dark blue color), when the 
+' bob is applied, it becomes the color with index 7 because the third  
+' bit is set to 1 (3 = %110, 7 = %111). This is the colour of the sinusoidal 
+' visible part of the bob.     
+Set Bob 1,0,%100,
+Bob 1,,32,1
+Channel 1 To Bob 1
+Amal 1,"A 0,(1,4)(2,4)(3,4)(4,4)(5,4)(6,4)(7,4)(8,4)(9,4)(10,4)(11,4)(12,4)(13,4)(14,4)(15,4)(16,4); S: L X=RA;P;J S;"
+Screen 1
+Amal On 
+Do 
+   Add X0,1,0 To 255
+   Add X1,2,0 To 511
+   Amreg(0)=X0
+   Screen Offset 0,X0,
+   Screen Offset 1,X1,
+   Wait Vbl 
+Loop 
+
+
