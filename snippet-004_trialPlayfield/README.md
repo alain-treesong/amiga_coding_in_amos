@@ -1,11 +1,11 @@
-## Trial Playfield
+## Three Playfields
 
-This short code demonstrates a simple trial playfield (three depths of field). 
+This short code demonstrates a simple three playfields (three depths of field). 
 Two fields scroll and the farthest plane is fixed and undulates sinusoidally.
 The (beautiful) graphics are drawn by Ansimuz. The other works of this artist can be found here : https://ansimuz.itch.io/.
 Thanks to him.
 
-![Submarine trial playfield](readImg/trialPlayfield.png)
+![Submarine three playfield](readImg/trialPlayfield.png)
 
 ### Screens and scrolling 
 
@@ -25,7 +25,7 @@ The part of the scenery where the bob is located has some specific colors : only
 So as pixels of the bob that are not transparent have the last third bit set, the pixels of the scenery with the colors 4,5,6 or 7 are unchanged when the bob
 is applied to them because they have already the 3rd bit to 1. It gives the illusion that the bob remains behind the scenery. 
 
-When the color of the scenery is 3 (the quite dark blue color, so no scenary), it becomes the color with index 7 because the third bit is set to 1 (3 = %110, 7 = %111). 
+When the color of the scenery is 3 (the quite dark blue color, so no scenery), it becomes the color with index 7 because the third bit is set to 1 (3 = %110, 7 = %111). 
 This is the colour of the sinusoidal visible part of the bob that appears.     
 
 The first time I seen this trick in Amos is in a code published by Bitbeamcanon (https://bitbeamcannon.com/). Thanks Mike !
