@@ -1,5 +1,6 @@
 ' Three playfield at 50 Fps on Amiga 500 
 ' Aghnar / Agima june 21 
+' Beautiful gfx by Ansimuz (https://ansimuz.itch.io/)
 
 Screen Open 0,320,256,8,Lowres
 Screen Display 0,160,72,256,192

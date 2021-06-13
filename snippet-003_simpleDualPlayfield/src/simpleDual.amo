@@ -1,4 +1,6 @@
 ' Simple Dual Playfied horizontal scrolling
+' Aghnar / Agima - 06.2021
+' Beautiful gfx by Ansimuz (https://ansimuz.itch.io/)
 Screen Open 0,256*2,192,8,Lowres
 Screen Display 0,160,72,256,192
 Flash Off : Curs Off : Hide On : Paper 0 : Cls 

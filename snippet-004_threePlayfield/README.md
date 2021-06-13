@@ -28,4 +28,4 @@ is applied to them because they have already the 3rd bit to 1. It gives the illu
 When the color of the scenery is 3 (the quite dark blue color, so no scenery), it becomes the color with index 7 because the third bit is set to 1 (3 = %110, 7 = %111). 
 This is the colour of the sinusoidal visible part of the bob that appears.     
 
-The first time I seen this trick in Amos is in a code published by Bitbeamcanon (https://bitbeamcannon.com/). Thanks Mike !
+The first time I saw this trick in Amos is in a code published by Bitbeamcanon (https://bitbeamcannon.com/). Thanks Mike !
