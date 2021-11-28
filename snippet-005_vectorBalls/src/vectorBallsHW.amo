@@ -1,0 +1,126 @@
+Set Buffer 12
+Rem Pyramid vector balls 
+Rem Aghnar / Agima 11.2021 
+
+' Init data
+' ---------
+Degree 
+CX=160 : CY=128 : Rem center of the screen 
+CZ=256 : Rem focus
+NDP=14 : Rem points count of the 3d object
+Dim X(NDP-1),Y(NDP-1),Z(NDP-1)
+Dim XE(NDP-1),YE(NDP-1),ZE(NDP-1)
+' Trigo table
+Dim C(1024),S(1024)
+For I=0 To 1023
+   C(I)=Qcos(I,256) : S(I)=Qsin(I,256)
+Next I
+AX=0
+AY=0
+' Path 
+Dim CY(512)
+'
+Screen Open 0,320,256,4,Lowres
+Paper 0 : Hide On : Flash Off : Curs Off : Cls 
+' crop the ball (from Hardwired / Silents - Crionics 1991
+Load Iff "assets/balle.iff"
+Get Bob 1,0,0 To 16,16
+Cls 0
+Wait Vbl 
+
+' We trace some kind of ground 
+Set Rainbow 0,0,16,"","",""
+Rain(0,7)=$12
+Rainbow 0,0,240,16
+
+Double Buffer : Autoback 0
+'
+' Define the 14 points of the "pyramid"
+For I=0 To 8
+X(I)=-24+(I mod 3)*16
+Y(I)=-24+(I/3)*16
+Z(I)=-12
+Next 
+
+For I=0 To 3
+X(I+9)=-16+(I mod 2)*16
+Y(I+9)=-16+(I/2)*16
+Z(I+9)=4
+Next 
+
+X(13)=-8 : Y(13)=-8 : Z(13)=20
+
+' The pyramid is ascending and descending while  
+' rotating 
+For I=0 To 127 : CY(I)=CY : Next 
+For I=128 To 383 : CY(I)=CY+(96*S((I-128)*4))/256 : Next 
+
+Timer=0
+T=0
+FPS=0
+Repeat 
+
+   Add K,1,0 To 383
+   CY=CY(K)
+
+   Add AX,2,0 To 1023
+   Add AY,4,0 To 1023
+
+   CAX=C(AX)
+   SAX=S(AX)
+   CAY=C(AY)
+   SIY=S(AY)
+
+   Blitter Clear 0,0
+   Blitter Clear 0,1
+
+   'Add T,1 
+   'If T=10 : Locate 0,1 : FPS=500/Timer : Timer=0 : T=0 : End If 
+   'Locate 0,1 : Print FPS;" "
+
+   For I=0 To NDP-1
+      
+      ' 3D rotation on X and Y axis    
+      X=X(I)
+      Y=Y(I)*CAX+Z(I)*SAX
+      Z=-Y(I)*SAX+Z(I)*CAX
+      '  
+      X2=X*CAY+(Z*SIY)/256
+      Y=Y
+      Z=-X*SIY+(Z*CAY)/256
+
+      ' keep the z value for the display sort  
+      ZE(I)=Z
+
+      Z=Z/256
+
+      ' Projection 
+      D=CZ+Z
+      XE(I)=CX+X2/D
+      YE(I)=CY+Y/D
+
+      If YE(I)>192 : YE(I)=192 : End If 
+      
+   Next I
+   '
+
+   ' The trick is here : we use the sort provided by Amos 
+   ' To keep the index of the point, we add this index to 
+   ' the z value but with an enough important offset in order 
+   ' to not influe on the sort itself 
+   For I=0 To NDP-1
+      ZE(I)=I+ZE(I)*16
+   Next 
+   Sort ZE(NDP-1)
+
+   ' The sort is in ascending order so we loop from the last      
+   For I=NDP-1 To 0 Step -1
+      N=ZE(I) and 15
+      Paste Bob XE(N),YE(N),1
+   Next 
+
+   Screen Swap 
+   Wait Vbl 
+
+Until Mouse Key=1
+
