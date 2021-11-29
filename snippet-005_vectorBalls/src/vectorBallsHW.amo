@@ -86,7 +86,6 @@ Repeat
       Z=-Y(I)*SAX+Z(I)*CAX
       '  
       X2=X*CAY+(Z*SIY)/256
-      Y=Y
       Z=-X*SIY+(Z*CAY)/256
 
       ' keep the z value for the display sort  
