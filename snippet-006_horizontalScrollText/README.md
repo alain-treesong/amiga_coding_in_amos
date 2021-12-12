@@ -37,14 +37,18 @@ E replaced A but the "player" did not see it because it is on the invisible part
 
 Then we continue with the F, then G, then H and each time we copy on the right and on the left:
 > EF[CDEF]--
+
 > EFG[DEFG]-
+
 > EFGH[EFGH]
 
 So at this point we scrolled to the end of the possible area. We could think that we are stuck because the right edge reaches 640 pixels.
 But since we were smart and built the same screen on the left side, we can go back directly to the left part (Screen offset at zero) and the viewer will see nothing:
 > [EFGH]EFGH
+
 And we can continue with IJK etc
 > I[FGHI]FGH
+
 > IJ[GHIJ]GH etc...
 
 So this an infinite horizontal scroll in Amos. As only the display pointer is used with screen offset and only a small piece of text is copied at each iteration, the scroll is smooth.
