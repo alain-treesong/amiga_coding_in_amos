@@ -1,0 +1,39 @@
+' How to display a font drawn (with DPaint)
+' Aghnar / Agima 2021
+' See horizontalScrollText and multiScroll examples to see that
+' in action
+
+Global ALPHA$
+Global TXT$
+
+ALPHA$="^!,-.'0123456789:()?ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+
+' Grab fonts from iff  
+' index of each icon matches with the position of the letter 
+' in the string ALPHA$ 
+' The result could be saved in an icon bank (or a bob bank)
+Screen Open 0,320,256,8,Lowres
+Flash Off : Curs Off : Hide 
+Load Iff "asset/font8.iff"
+For I=0 To Len(ALPHA$)-1
+   Get Icon I+1,(I mod 10)*32,(I/10)*30 To(I mod 10)*32+32,(I/10)*30+30
+Next 
+Wait Vbl : Cls 0
+
+' Display some chars 
+TXT$="AMIGA"
+X=0
+For I=1 To Len(TXT$)
+   PCHAR[X,0,I]
+   Add X,32
+Next 
+
+' The idea is to find which is the index of the letter to display 
+' in the ALPHA$ string. This index is the same of the letter 
+' in the bank of icons 
+' The ITXT parameter is the position of the letter of the TXT$ string
+' to display 
+Procedure PCHAR[X,Y,ITXT]
+   IC=Instr(ALPHA$,Mid$(TXT$,ITXT,1))
+   F Paste Icon X,Y,IC
+End Proc

@@ -1,0 +1,79 @@
+' Multi horizontal scroll texts  
+' See horizontalScrollText.amos for a simple horizontal scroll.
+' Aghnar / Agima dec. 2021 
+
+Global ALPHA$
+Global TXT$
+
+ALPHA$="^!,-.'0123456789:()?ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+TXT$="          A STANDARD HORIZONTAL 'INFINITE' SCROLLTEXT IN AMOS. "
+TXT$=TXT$+"THE ALGO CAN BE USED TO HANDLE FOR EXAMPLE AN HORIZONTAL "
+TXT$=TXT$+"SCROLLING PLATFORM GAME. AGHNAR - AGIMA IN DEC. 2021."
+
+' Grab fonts from iff  
+' index of each icon matches with the position of the letter 
+' in the string ALPHA$ 
+Screen Open 0,320,256,8,Lowres
+Flash Off : Curs Off : Hide 
+Load Iff "asset/font8.iff"
+For I=0 To Len(ALPHA$)-1
+   Get Icon I+1,(I mod 10)*32,(I/10)*30 To(I mod 10)*32+32,(I/10)*30+30
+Next 
+Wait 50 : Fade 1 : Wait 15 : Cls 0 : Wait Vbl 
+
+' 3 screens are opened with a width a bit larger than the double 
+' of the screen
+For K=0 To 2
+   Screen Open K,320*2+64,32,8,0
+   Screen Display K,,96+48*K,320,32
+   Flash Off : Curs Off : Hide : Paper 0 : Cls 
+   Get Icon Palette 
+   Wait Vbl 
+Next 
+
+Dim I(3),XS(3),SPEED(3)
+For K=0 To 2
+   I(K)=10 : Rem the index of the next letter       
+   XS(K)=32 : Rem the x offset of the screen 
+   Screen Offset K,XS(K),0
+   Wait Vbl 
+Next 
+
+SPEED(0)=1
+SPEED(1)=2
+SPEED(2)=4
+
+Do 
+
+   For K=0 To 2
+      Screen K
+
+      ' display the next letter in front and back of the display 
+      If(XS(K) mod 32)=0
+         If XS(K)>=32 : PCHAR[XS(K)-32,0,I(K)] : End If 
+         PCHAR[XS(K)+320,0,I(K)]
+         Add I(K),1,1 To Len(TXT$)
+      End If 
+
+      ' display the next letter in front and back of the display 
+      Screen Offset K,XS(K),
+      Add XS(K),SPEED(K)
+
+      ' When the pos 352 is reached, the offset is set to 0
+      ' but as the same image at the left was built, this is invisible 
+      If XS(K)>=352 Then XS(K)=0
+
+   Next 
+   Wait Vbl 
+
+Loop 
+
+
+Procedure PCHAR[X,Y,ITXT]
+   IC=Instr(ALPHA$,Mid$(TXT$,ITXT,1))
+   F Paste Icon X,Y,IC
+End Proc
+
+
+
+

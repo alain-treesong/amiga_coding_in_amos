@@ -1,0 +1,65 @@
+' Classical hoizontal scroll text
+' See displayFont.amos for an explanation of the display of a font 
+' Aghnar / Agima 2021
+
+Global ALPHA$
+Global TXT$
+
+ALPHA$="^!,-.'0123456789:()?ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+TXT$="          A STANDARD HORIZONTAL 'INFINITE' SCROLLTEXT IN AMOS. "
+TXT$=TXT$+"THE ALGO CAN BE USED TO HANDLE FOR EXAMPLE AN HORIZONTAL "
+TXT$=TXT$+"SCROLLING PLATFORM GAME. AGHNAR - AGIMA IN DEC. 2021."
+
+' Grab fonts from iff  
+' index of each icon matches with the position of the letter 
+' in the string ALPHA$ 
+Screen Open 0,320,256,8,Lowres
+Flash Off : Curs Off : Hide 
+Load Iff "asset/font8.iff"
+
+For I=0 To Len(ALPHA$)-1
+   Get Icon I+1,(I mod 10)*32,(I/10)*30 To(I mod 10)*32+32,(I/10)*30+30
+Next 
+Wait 50 : Fade 1 : Wait 15 : Cls 0 : Wait Vbl 
+
+' A screen a bit wider than the double of the screen is opened 
+Screen Open 0,320*2+64,32,8,0
+Screen Display 0,,,320,32
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Get Icon Palette 
+Wait Vbl 
+
+I=10 : Rem the index of the next letter       
+XS=32 : Rem the x offset of the screen 
+Screen Offset 0,XS,0
+Wait Vbl 
+
+Do 
+   Add I,1,1 To Len(TXT$)
+
+   ' display the next letter in front and back of the display 
+   If XS>=32 Then PCHAR[XS-32,0,I]
+   PCHAR[XS+320,0,I]
+
+   ' scroll of 16 pixels, 2 pixels by frame speed 
+   For J=1 To 16
+      Screen Offset 0,XS,
+      Add XS,2
+      Wait Vbl 
+   Next 
+
+   ' When the pos 352 is reached, the offset is set to 0
+   ' but as the same image was built at the left of the display, this 
+   ' is invisible.
+   If XS>=352 Then XS=0
+
+Loop 
+
+Procedure PCHAR[X,Y,ITXT]
+   IC=Instr(ALPHA$,Mid$(TXT$,ITXT,1))
+   Paste Icon X,Y,IC
+End Proc
+
+
+
+
