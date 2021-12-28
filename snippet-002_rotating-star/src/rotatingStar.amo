@@ -1,16 +1,15 @@
-' Simple rotating flat star
-' From the demo HAPPY NEW YEAR 2021/AGIMA Dec 2020
-' A reworked to be standalone
+' Simple rotating flat star with a kind of shadow  
+' From the demo « HAPPY NEW YEAR 2021»/AGIMA Dec 2020
+' A bit reworked to be standalone
 
 ' Aghnar may 21
 
-Set Buffer 32
+Set Buffer 16
 
 Dim C(1024),S(1024)
 
-Global NDP,C(),S()
+Global C(),S()
 Global CX,CY,ANG
-Global T
 Global X1,Y1,X2,Y2,X3,Y3,X4,Y4,X5,Y5
 Global X6,Y6,X7,Y7,X8,Y8,X9,Y9,X0,Y0
 Global XE1,YE1,XE2,YE2,XE3,YE3,XE4,YE4,XE5,YE5
@@ -19,8 +18,7 @@ Global XE6,YE6,XE7,YE7,XE8,YE8,XE9,YE9,XE0,YE0
 Degree 
 
 For I=0 To 1023
-   ANG=I : Rem ((1024*I)/360) avec i (0,359)
-   C(I)=Qcos(ANG,256) : S(I)=Qsin(ANG,256)
+   C(I)=Qcos(I,256) : S(I)=Qsin(I,256)
 Next I
 
 Screen Open 0,320,256,4,Lowres
@@ -34,9 +32,6 @@ ANG=0
 CX=160 : CY=128
 
 ' Definition of the star 
-NDP=10
-Palette $214,$519,$103,$519
-
 X0=170 : Y0=0
 X1=69 : Y1=49
 X2=52 : Y2=162
@@ -47,9 +42,6 @@ X6=-137 : Y6=-100
 X7=-26 : Y7=-81
 X8=53 : Y8=-162
 X9=69 : Y9=-49
-
-CX=160
-CY=128
 
 Repeat 
    
