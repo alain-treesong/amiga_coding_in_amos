@@ -23,7 +23,7 @@ The font seems to come from the demoscene and was posted on the Web by Daniel Gu
 
 Here is the principle of idea of the infinite scoll text:
 
-Let's suppose that the text is : ABCDEFGHIJK, knowing that we can only display 4 letters take the whole visible size. If the visible size is 320 pixels, we assume that we have a screen of 320x2=640 pixels
+Let's suppose that the text is : ABCDEFGHIJK, knowing that we can only display 4 letters on the whole visible size. If the visible size is 320 pixels, we assume that we have a screen of 320x2=640 pixels
 > [----]---- : So 8 dashes for 640 pixels. Between brackets, the visible area.
 
 At the beginning the visible screen is initialized with ABCD:
@@ -51,8 +51,8 @@ And we can continue with IJK etc
 
 > IJ[GHIJ]GH etc...
 
-So this an infinite horizontal scroll in Amos. As only the display pointer is used with screen offset and only a small piece of text is copied at each iteration, the scroll is smooth.
-In fact we have to add small strips on the right and on the left of the visible window in order not to see the icons displayed during the completion of the scenery and we have to manage the display by icon according to the speed and the direction of the scroll but
+So this is an infinite horizontal scroll implementation in Amos. As only the display pointer is used with screen offset and only a small piece of text is copied at each iteration, the scroll is smooth.
+In fact we have to add small strips on the right and on the left of the visible window in order not to see the icons/letters displayed during the completion of the scenery and we have to manage the display by icon according to the speed and the direction of the scroll but
 the principle is the one described.
 
 ![Font](readImg/scrollText.png)

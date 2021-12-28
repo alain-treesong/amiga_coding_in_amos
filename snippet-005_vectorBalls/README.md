@@ -18,7 +18,7 @@ The ball is a bob of 16x16 grabbed from an IFF image in the asset folder.
 The 14 3D points of the pyramid are simply rotated and projected on the xe,ye 2d coordinates.
 To gain some speed, a trick is used : the 3d z coordinates are kept in an array. Then "sort" instruction of Amos is used to quick sort the Z allowing to display the balls in the accurate order (the farthest first).
 To keep a link between the index of a ball and its z coordinates, the index is add to the z value after have multipling this value by 16 in order that the addition of the index not to influe the sort.
-A sort algo can be implemented in Amos but it will slower.
+A sort algo can be implemented in Amos but it will be slower.
 
 We can change the value of cz to increase the size of the pyramid on the screen.
 
