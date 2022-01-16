@@ -1,0 +1,156 @@
+' Quick music disk to illustrate 
+' some Amos music instructions 
+' Aghnar / Agima 01/22 
+Close Editor 
+Auto View Off 
+Screen Open 0,320,256,4,0
+Curs Off : Flash Off : Hide On 
+Palette $421,$FFF,$0,$FF0
+' a simple rectangle for the simple vumeter
+Ink 3 : Bar 0,0 To 15,31 : Get Bob 1,0,0 To 16,32
+Paper 0 : Cls 
+Auto View On 
+
+TUNESCOUNT=4
+Dim M$(TUNESCOUNT),T$(TUNESCOUNT),TIM(TUNESCOUNT)
+Global M$(),T$(),TIM()
+Global TUNESCOUNT
+
+' Set 4 tunes with path, name and duration in second 
+' These tunes come from our 4 last prods : 
+' Yes!, Happy New Year 2021, New Impact and Happy New Year 2022
+SET_TUNE[0,"assets/eclipse.mod","Eclipse / Hi-Lite 1992",76]
+SET_TUNE[1,"assets/cantstopu2020.mod","Can't stop u / mAZE 2020",160]
+SET_TUNE[2,"assets/hondasTheme.mod","Honda's Theme / Ixien 2021",59]
+SET_TUNE[3,"assets/endOf2021.mod","End of 2021 / mAZE 2021",135]
+
+SET_SCENE
+
+' Init first tune
+M=0
+LOA_TUNE[M$(M)]
+T=Timer
+
+' The main loop : left mouse key or end of song brings the next one... 
+Do 
+   Bob Clear 
+   If(T>=TIM(M)) or(Mouse Key=1)
+      Amreg(0)=0 : Amreg(1)=0 : Amreg(2)=0 : Amreg(3)=0
+      Bob Draw : Screen Swap : Wait Vbl 
+      For I=64 To 0 Step -2
+         Pt Volume I
+         Bob Clear : Bob Draw 
+         Screen Swap : Wait Vbl 
+      Next 
+      For I=0 To 8
+         Bob Clear : Bob Draw : Screen Swap : Wait Vbl 
+      Next 
+      Pt Stop : Pt Volume 64
+      Add M,1,0 To 3
+      LOA_TUNE[M$(M)]
+      Rainbow 1,0,128+M*12,16
+      Wait Vbl 
+      Bob Clear 
+   End If 
+   T=Timer
+
+   ' time in second is displayed in the bottom right of the screen
+   Cls 0,260,180 To 320,200
+   WRITE[260,190,Str$(T/50)+" s"]
+
+   ' Each channel's volume is get by the pt vu function 
+   ' and set in external Amal register that will be used
+   ' to move the bobs 
+   For I=1 To 4
+      Amreg(I-1)=Pt Vu(I-1)/4
+   Next 
+   Bob Draw 
+   Screen Swap 
+   Wait Vbl 
+Loop 
+
+Procedure SET_TUNE[I,M$,T$,TIM_IN_SEC]
+   M$(I)=M$ : T$(I)=T$ : TIM(I)=TIM_IN_SEC*50
+End Proc
+
+' A simple text displayer using built-in text functions
+' and "os" font. Bitmap font can be used instead (see snippet 6 example) 
+Procedure WRITE[X,Y,A$]
+   Gr Writing 0
+   Ink 2 : Text X+1,Y+2,A$
+   Ink 1 : Text X,Y,A$
+   Gr Writing 1
+End Proc
+
+Procedure SET_SCENE
+   ' Amos can handle easily "rasters" 
+   ' A snippet will be dedicated to them
+   ' Here are 3 rasters (called "rainbow" in Amos world)
+
+   ' A better background
+   Set Rainbow 0,0,64,"","",""
+   For I=0 To 7 : Rain(0,I)=$321 : Next 
+   For I=8 To 15 : Rain(0,I)=$221 : Next 
+   For I=16 To 23 : Rain(0,I)=$211 : Next 
+   Rain(0,17)=$221
+   For I=24 To 31 : Rain(0,I)=$210 : Next 
+   Rain(0,25)=$211
+   For I=32 To 47 : Rain(0,I)=$200 : Next 
+   For I=48 To 60 : Rain(0,I)=$100 : Next 
+   Rain(0,49)=$200
+   For I=61 To 63 : Rain(0,I)=$100 : Next 
+   Rainbow 0,0,240,64
+
+   ' Raster marking the current tune
+   Set Rainbow 1,0,16,"","",""
+   Rain(1,0)=$421 : Rain(1,1)=$621 : Rain(1,2)=$821
+   Rain(1,3)=$A21 : Rain(1,4)=$C21 : Rain(1,5)=$E21
+   Rain(1,6)=$F31 : Rain(1,7)=$F51 : Rain(1,8)=$F51
+   Rain(1,9)=$F31 : Rain(1,10)=$E21 : Rain(1,11)=$C21
+   Rain(1,12)=$A21 : Rain(1,13)=$821 : Rain(1,14)=$621
+   Rain(1,15)=$421
+   Rainbow 1,0,128,16
+
+   ' Raster for the vumeter 
+   Set Rainbow 2,3,32,"","",""
+   For I=0 To 15 : Rain(2,I)=$FF0-I*16 : Next 
+   For I=16 To 31 : Rain(2,I)=$421+(8-(I/2-8))*256 : Next 
+   Rainbow 2,3,211,32
+
+   ' Some text and tune's names 
+   WRITE[44,32,"Quick musics disk in 150 lines"]
+   WRITE[44,40,"______________________________"]
+   WRITE[100,70,"4 great tunes"]
+   WRITE[100,78,"............."]
+   For I=1 To TUNESCOUNT
+      WRITE[60,84+I*12,T$(I-1)]
+   Next 
+
+   ' Prepare 4 bobs vumeter, one for each channel 
+   ' A quick written amal string is used for the movements
+   ' The volume value of each channel will be set in
+   ' an external register (RA,RB,RC and RD) 
+   ' (see main loop)  
+   Double Buffer 
+   Autoback 0 : Bob Update Off 
+   For I=1 To 4
+      Bob I,126+(I-1)*17,199,1
+      Limit Bob I,0,128 To 319,198
+      Channel I To Bob I
+      A$="S: If R"+Chr$(64+I)+">0 J M; "
+      A$=A$+"L R0=Y+1;If R0<199 J R; L Y=199; P; J S;"
+      A$=A$+"R: L Y=R0; P; J S;"
+      A$=A$+"M: L R0=Y-R"+Chr$(64+I)+"; If R0>166 J N;L Y=167; P; J S;"
+      A$=A$+"N: L Y=R0; P; J S;"
+      Amal I,A$
+   Next 
+
+   Amal On 
+   Wait Vbl 
+End Proc
+
+Procedure LOA_TUNE[A$]
+   Track Load A$,10
+   Pt Play 10
+   Timer=0
+End Proc
