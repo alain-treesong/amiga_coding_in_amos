@@ -1,0 +1,123 @@
+Set Buffer 12
+Rem Simple wire 3d cube  
+Rem
+Rem Aghnar / Agima may 2022
+
+Degree 
+NDP=8
+CX=160
+CY=128
+CZ=256*5
+Dim X(NDP),Y(NDP),Z(NDP)
+Dim XE(NDP),YE(NDP)
+Dim C(1024),S(1024)
+'
+Global X(),Y(),Z(),XE(),YE(),C(),S(),NDP,AX,AY,AZ,CX,CY,CZ
+'
+Screen Open 0,320,256,2,Lowres
+Screen Display 0,128,40,320,256
+Paper 0 : Hide On : Flash Off : Curs Off : Cls 
+Palette $0,$666
+
+' Simple horizontal line using copper to enhance the scene 
+Set Rainbow 0,0,16,"","",""
+Rain(0,0)=$CCC
+Rain(0,1)=$444
+Rain(0,2)=$111
+Rainbow 0,0,270,16
+
+Ink 1 : Pen 1
+Double Buffer : Autoback 0
+
+' Trigo table and definition of the 8 points for the cube
+For I=0 To 1023
+   C(I)=Qcos(I,256) : S(I)=Qsin(ANG,256)
+Next I
+'
+For I=1 To NDP
+   Read X(I),Y(I),Z(I)
+Next 
+'
+Data -1,-1,-1
+Data 1,-1,-1
+Data 1,1,-1
+Data -1,1,-1
+Data -1,-1,1
+Data 1,-1,1
+Data 1,1,1
+Data -1,1,1
+'
+AX=0
+AY=0
+AZ=0
+
+' Main loop : rotation on the 3 axis 
+Do 
+   
+   Add AX,-1,0 To 1023
+   Add AY,1,0 To 1023
+   Add AZ,-1,0 To 1023
+   
+   RENDER_CUBE
+   
+   Screen Swap 
+   Wait Vbl 
+
+Loop 
+
+
+Procedure RENDER_CUBE
+   
+   CAX=C(AX)
+   SAX=S(AX)
+   CAY=C(AY)
+   SIY=S(AY)
+   CAZ=C(AZ)
+   SAZ=S(AZ)
+
+   ' Rotation and projection of the 8 points. 
+   ' A lot of optimizations are possible here : 
+   ' - inlining, no array (xe(1) replaced by xe1) 
+   ' - the fact that the initial x,y z values are 1 or -1   
+
+   For I=1 To NDP
+      ' rotation %X  
+      X=X(I)*256
+      Y=Y(I)*CAX+Z(I)*SAX
+      Z=-Y(I)*SAX+Z(I)*CAX
+      '  
+      ' rotation %Y
+      X2=X*CAY+Z*SIY
+      Z=-X*SIY+Z*CAY
+      '  
+      ' rotation %Z
+      X2=X2/256
+      X=X2*CAZ+Y*SAZ
+      Y=-X2*SAZ+Y*CAZ
+      '
+      ' Projection 
+      D=CZ+Z/256
+      XE(I)=CX+X/D
+      YE(I)=CY+Y/D
+   Next I
+   '
+
+   ' Draw all 12 lines  
+   Blitter Clear 0,0
+   Turbo Draw XE(2),YE(2) To XE(6),YE(6),1,1
+   Turbo Draw XE(6),YE(6) To XE(5),YE(5),1,1
+   Turbo Draw XE(5),YE(5) To XE(1),YE(1),1,1
+   Turbo Draw XE(1),YE(1) To XE(2),YE(2),1,1
+   Turbo Draw XE(5),YE(5) To XE(8),YE(8),1,1
+   Turbo Draw XE(8),YE(8) To XE(7),YE(7),1,1
+   Turbo Draw XE(7),YE(7) To XE(6),YE(6),1,1
+   Turbo Draw XE(1),YE(1) To XE(4),YE(4),1,1
+   Turbo Draw XE(4),YE(4) To XE(3),YE(3),1,1
+   Turbo Draw XE(3),YE(3) To XE(2),YE(2),1,1
+   Turbo Draw XE(3),YE(3) To XE(7),YE(7),1,1
+   Turbo Draw XE(8),YE(8) To XE(4),YE(4),1,1
+
+End Proc
+
+
+
