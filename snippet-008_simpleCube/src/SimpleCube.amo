@@ -31,7 +31,7 @@ Double Buffer : Autoback 0
 
 ' Trigo table and definition of the 8 points for the cube
 For I=0 To 1023
-   C(I)=Qcos(I,256) : S(I)=Qsin(ANG,256)
+   C(I)=Qcos(I,256) : S(I)=Qsin(I,256)
 Next I
 '
 For I=1 To NDP
