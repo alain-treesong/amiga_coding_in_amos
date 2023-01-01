@@ -1,0 +1,128 @@
+' Basic rotation tetrahedron on two axes 
+' Can be optimized by inline loop and replacing arrays by simple variables 
+' Aghnar / jan 23
+Set Buffer 12
+Degree 
+
+Dim C(1023),S(1023)
+Dim X(4),Y(4),Z(4),XE(4),YE(4)
+
+Global AX,AY,AZ
+Global C(),S(),C1X,S1X,C1Y,S1Y
+Global X(),Y(),Z(),XE(),YE()
+Global X,Y,Z,Y1,A1,A2,B1,B2,AX,AY
+Global I
+Global CX,CY,CZ
+'
+For I=0 To 1023
+   C(I)=Qcos(I,256) : S(I)=Qsin(I,256)
+Next I
+'
+
+Screen Open 0,320,256,16,Lowres
+Flash Off : Curs Off : Hide On : Cls 0
+Double Buffer : Autoback 0
+Palette $F80,$FF0,$FC0,$FA0
+
+' Definition of the tetrahedron
+For I=0 To 3
+Read X(I),Y(I),Z(I)
+Next 
+Data 1,1,1
+Data -1,-1,1
+Data -1,1,-1
+Data 1,-1,-1
+' so origin is the center of the tetra 
+
+
+AX=1
+AY=0
+CX=160
+CY=128
+CZ=256*32
+Do 
+   Blitter Wait : Blitter Clear 0,0 : Blitter Clear 0,1
+
+   Add AX,3,0 To 1023
+   Add AY,1,0 To 1023
+
+   C1X=C(AX) : S1X=S(AX)
+   C1Y=C(AY) : S1Y=S(AY)
+
+   ' rotation and projection of the 4 points
+   For I=0 To 3
+      ' rotation %y
+      X=X(I)*C1X-Z(I)*S1X
+      Y=Y(I)*256
+      Z=Z(I)*C1X+X(I)*S1X
+
+      ' rotation %x
+      Y1=Y*C1Y-Z*S1Y
+      Z=Z*C1Y+Y*S1Y
+
+      Y=Y1/256
+      Z=Z/256
+
+      ' projection 
+      D=CZ+Z
+      XE(I)=CX+(X*8*256)/D
+      YE(I)=CY+(Y*8*256)/D
+   Next 
+
+   ' To evaluate if a side has to be displayed, the scalar product
+   ' is computed on two vertices defining the side. The sign indicated
+   ' if the sign will be drawn
+
+   ' AB, AC 
+   A1=XE(1)-XE(0)
+   A2=YE(1)-YE(0)
+   B1=XE(2)-XE(0)
+   B2=YE(2)-YE(0)
+   If A1*B2<A2*B1
+      Turbo Draw XE(0),YE(0) To XE(1),YE(1),1,-1
+      Turbo Draw XE(1),YE(1) To XE(2),YE(2),1,-1
+      Turbo Draw XE(2),YE(2) To XE(0),YE(0),1,-1
+   End If 
+
+   ' AC,AD  
+   A1=XE(2)-XE(0)
+   A2=YE(2)-YE(0)
+   B1=XE(3)-XE(0)
+   B2=YE(3)-YE(0)
+   If A1*B2<A2*B1
+      Turbo Draw XE(0),YE(0) To XE(2),YE(2),2,-2
+      Turbo Draw XE(2),YE(2) To XE(3),YE(3),2,-2
+      Turbo Draw XE(3),YE(3) To XE(0),YE(0),2,-2
+   End If 
+
+   ' AD,AB
+   A1=XE(3)-XE(0)
+   A2=YE(3)-YE(0)
+   B1=XE(1)-XE(0)
+   B2=YE(1)-YE(0)
+   If A1*B2<A2*B1
+      Turbo Draw XE(0),YE(0) To XE(3),YE(3),3,-3
+      Turbo Draw XE(3),YE(3) To XE(1),YE(1),3,-3
+      Turbo Draw XE(1),YE(1) To XE(0),YE(0),3,-3
+   End If 
+
+   ' BC,BD
+   A1=XE(2)-XE(1)
+   A2=YE(2)-YE(1)
+   B1=XE(3)-XE(1)
+   B2=YE(3)-YE(1)
+   If A1*B2>A2*B1
+      Turbo Draw XE(1),YE(1) To XE(2),YE(2),1,-1
+      Turbo Draw XE(2),YE(2) To XE(3),YE(3),1,-1
+      Turbo Draw XE(3),YE(3) To XE(1),YE(1),1,-1
+   End If 
+
+   Blitter Fill 0,0
+   Blitter Fill 0,1
+
+   Screen Swap : Wait Vbl 
+
+Loop 
+
+
+
