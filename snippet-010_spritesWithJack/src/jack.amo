@@ -1,0 +1,207 @@
+' Bombjack Amos    
+' Part 1 : how to use sprites  
+'
+'
+' Aghnar / Agima 08/2023 
+'
+
+' 16 colors screen full page pal 
+'
+Screen Open 0,320,256,16,0
+Screen Display 0,,,320,256
+Flash Off : Curs Off : Hide 
+Paper 0 : Cls 
+'
+' load icons for background and sprites
+Load "assets/icons.abk"
+Load "assets/sprites.abk"
+Wait Vbl 
+Get Icon Palette 
+Palette ,,,,,,,,,,,,,,,,$0,$F00,$555,$888,$AF,$BBB,$EC8,$DDD,$BFC,$FF0,$FFF,$0
+
+' Set the background at XL,YL
+XL=(320-224)/2
+YL=(256-224)/2
+Paste Icon XL,YL,1
+Double Buffer : Rem double buffer is not usefull with sprites. It prepares next updates... 
+
+'
+' Jack : sprites 0 et 1
+' ---------------------
+'  
+YSMAX=YL+224-16 : Rem max Y for jack 
+Sprite 0,X Hard(100),Y Hard(YSMAX),1
+Wait Vbl 
+Channel 1 To Sprite 0
+
+' The animation of jack  
+'
+' A simple state machine is implemented  
+' The variable is STATE in the main loop and the register RS / Amreg(18) 
+' The state are :
+' 0 : jack is on the ground
+' 1 : jack is flying up
+' 2 : jack is falling
+' When Jack changes state, the register RT / Amreg(19) is used 
+' RT=0 : no change, RT=-1 : new state
+'  
+' NRJ is a variable to handle acceleration during ascent or descent
+'
+STATE=0
+NRJ=0
+Amreg(18)=STATE
+Amreg(19)=-1
+
+' To pass joystick values to Amal channel, the following registers are used: 
+' RF = Amreg(5)  : Fire
+' RX = Amreg(23) : X speed -2,0,2  
+'  
+
+J$=""
+J$=J$+"L R0=0; S: "
+
+' state has changed => reset animation 
+J$=J$+"If RT=RS J T; L R0=8; L RT=RS; T: L R1=RS"
+
+' branch in function of state
+J$=J$+"If RS>0 Jump Fly;"
+' Walk : 
+J$=J$+"If RX=R0 Jump Horizontal;"
+J$=J$+"L R0=RX;"
+J$=J$+"If RX>0 J Right;"
+J$=J$+"If RX=0 J Idle;"
+J$=J$+"A 0,(6,4)(7,4)(8,4)(9,4); M RX,0,1; J S;"
+J$=J$+"Idle: A 1,(1,1); J S;"
+J$=J$+"Right: A 0,(2,4)(3,4)(4,4)(5,4); M RX,0,1; J S;"
+J$=J$+"Horizontal: M RX,0,1; J S;"
+J$=J$+""
+' Fly up / down
+J$=J$+"Fly: "
+J$=J$+"If RX=R0 Jump Wfly;"
+J$=J$+"L R0=RX;"
+J$=J$+"If RX<0 J Leftfly;"
+J$=J$+"If RX=0 J Up;"
+' droite 
+J$=J$+"A 0,(R1+13,1); M RX,RY,1; J S;"
+J$=J$+"Up: A 1,(R1+9,1); J S;"
+J$=J$+"Leftfly: A 0,(R1+15,1); M RX,RY,1; J S;"
+J$=J$+"Wfly: M RX,RY,1; J S;"
+
+Amal 1,J$
+Amal On 1
+Wait Vbl 
+
+' Mechanical fly  : sprites 2/3
+' -----------------------------
+'
+Sprite 2,X Hard(64),Y Hard(16),30
+' Simple move left/right 
+Channel 2 To Sprite 2
+B$=""
+B$=B$+"S: "
+B$=B$+"A 0,(41,6)(42,6)(43,6)(42,6); M 100,0,100;"
+B$=B$+"A 0,(30,6)(31,6)(32,6)(31,6); M-100,0,100; "
+B$=B$+"J S"
+Amal 2,B$
+Amal On 2
+
+'
+' Main loop
+' ---------
+'
+
+' Variables to handle jack position on screen, speed and joystick button 
+XS=0
+YS=0
+VX=0
+VY=0
+HOLDFIRE=-1
+PRESSFIRE=0
+
+' Note : 
+' In the loop, us of joystick with many instructions (jleft, jright
+' fire...) is not optimized and the different if/else can be upgraded
+' But it's more readable and sufficient for this example snippet 
+
+Do 
+
+   XS=X Screen(X Sprite(0))
+   YS=Y Screen(Y Sprite(0))
+
+   ' Moves left / right 
+   If Jleft(1)
+      If XS>=XL+2
+         VX=-2
+      Else 
+         VX=0
+      End If 
+   Else If Jright(1)
+      If XS<=(XL-16+224-2)
+         VX=2
+      Else 
+         VX=0
+      End If 
+   Else VX=0
+   End If 
+
+   PRESSFIRE=Fire(1)
+
+   ' flight up
+   If STATE=0 and PRESSFIRE
+      NRJ=64
+      STATE=1
+   Else If STATE=1 and NRJ>0
+      If HOLDFIRE=0 and PRESSFIRE
+         STATE=2
+         NRJ=0
+         VY=0
+      Else 
+         Add NRJ,-1
+         If NRJ>60
+            VY=-3
+         Else If NRJ>16
+            VY=-2
+         Else If NRJ>2
+            VY=-1
+         Else 
+            VY=0
+         End If 
+     End If 
+   Else If STATE=1 and NRJ<=0
+      NRJ=0
+      VY=2
+      STATE=2
+   End If 
+
+   ' Fall 
+   If STATE=2 and YS+VY>YSMAX
+      VY=YSMAX-YS-VY
+      STATE=0
+   Else If STATE=2
+      If PRESSFIRE and HOLDFIRE=0
+         NRJ=0
+      End If 
+      Add NRJ,1
+      If NRJ>64
+         VY=4
+      Else If NRJ>32
+         VY=3
+      Else If NRJ>16
+         VY=2
+      Else If NRJ>4
+         VY=1
+      Else 
+         VY=0
+      End If 
+   End If 
+
+
+   HOLDFIRE=PRESSFIRE
+
+   Amreg(23)=VX
+   Amreg(24)=VY
+   Amreg(18)=STATE
+
+   Wait Vbl 
+
+Loop 

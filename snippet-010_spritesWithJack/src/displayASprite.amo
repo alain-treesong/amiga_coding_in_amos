@@ -1,0 +1,29 @@
+' How to display sprites 
+' Aghnar / Agima 08/2023 
+
+' 16 colors screen full page pal 
+'
+Screen Open 0,320,256,16,0
+Screen Display 0,,,320,256
+Flash Off : Curs Off : Hide 
+Paper 0 : Cls 
+'
+' load icons for background and sprites
+Load "assets/icons.abk"
+Load "assets/sprites.abk"
+Wait Vbl 
+Get Icon Palette 
+Palette ,,,,,,,,,,,,,,,,$0,$F00,$555,$888,$AF,$BBB,$EC8,$DDD,$BFC,$FF0,$FFF,$0
+
+' Set the background at XL,YL
+XL=(320-224)/2
+YL=(256-224)/2
+Paste Icon XL,YL,1
+
+' Display the sprite with index 0 in the middle of the background. 
+' A jack is a 16 width 16 colors image, it uses hardware sprites 0 and 1 
+'
+Sprite 0,X Hard(160-8),Y Hard(YL+112),1
+Wait Vbl 
+
+Wait Key 
