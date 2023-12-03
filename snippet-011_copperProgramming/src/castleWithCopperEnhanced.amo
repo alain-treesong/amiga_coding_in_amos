@@ -1,0 +1,124 @@
+' Amos with copper direct use  
+' Agony background castle with mirroring 
+'
+' Aghnar/Agima 12/2023 
+
+' Define an Amos screen
+Screen Open 0,320,256,2,0 : Flash Off : Curs Off : Hide On : Cls 0
+Screen Hide 0 : Wait Vbl 
+Load Iff "castle.iff"
+Wait Vbl 
+
+' Save the one bitplane allocation associated to the Amos screen 0 
+' Set bitplane data in $dff0E0 and $dff0E2 bitplane 0 register 
+BPL0HW=Logbase(0)/$FFFF
+BPL0LW=Logbase(0) and $FFFF
+
+
+' Prepare own copperlist 
+' ---------------------- 
+' Allocation of 1k chip memory that must begin at an even address
+Reserve As Chip Work 10,1024
+CL0=Start(10)
+If(CL0 and 1)=1 Then Add CL0,1
+CL=CL0
+Restore COPPER_LIST
+Repeat 
+   Read A,B
+   Doke CL,A : Add CL,2
+   Doke CL,B : Add CL,2
+Until A=$FFFF and B=$FFFE
+
+' Start own copper list
+' ---------------------
+'
+Wait Vbl 
+' To avoid some bitplane glich, registers of bitplane are fetch with the 68K 
+Doke $DFF0E0,BPL0HW
+Data $DFF0E2,BPL0LW
+Copper Off 
+
+' Install dma value
+Wait Vbl 
+Doke $DFF096,$7FFF
+Doke $DFF096,$83C0 : Rem $83C0 = %1000 0011 1000 0000 enables bitplane and copper dma 
+
+' set our own copperlist 
+Loke $DFF080,CL0
+Doke $DFF088,1
+
+Repeat 
+   Wait Vbl 
+Until Mouse Key=1
+
+' Come back to Amos system 
+' ------------------------ 
+Wait Vbl 
+Doke $DFF096,$7FFF
+Doke $DFF096,$83F0
+Wait Vbl 
+Copper On 
+End 
+
+' The copper list
+' ---------------
+COPPER_LIST:
+   Data $1FC,$0
+   Data $100,$1200
+   Data $102,$0
+   Data $108,$0
+   Data $10A,$0
+_SCREEN_DISPLAY:
+   Data $8E,$2C81
+   Data $90,$2CC1
+   Data $92,$38
+   Data $94,$D0
+BIPLANE_PTR:
+   Data $E0,BPL0HW
+   Data $E2,BPL0LW
+_COLOR:
+   Data $180,$0
+   Data $182,$FFF
+
+   Data $2B01,$FF00,$182,$33
+   Data $4901+$3700,$FF00,$182,$133
+   Data $4901+$4100,$FF00,$182,$233
+   Data $4901+$4B00,$FF00,$182,$333
+   Data $4901+$5500,$FF00,$182,$433
+   Data $4901+$5F00,$FF00,$182,$533
+   Data $4901+$6900,$FF00,$180,$200
+   Data $4901+$6900,$FF00,$182,$633
+   Data $4901+$7300,$FF00,$180,$300
+   Data $4901+$7300,$FF00,$182,$733
+   Data $4901+$7D00,$FF00,$180,$400
+   Data $4901+$7D00,$FF00,$182,$833
+   Data $4901+$8700,$FF00,$180,$500
+   Data $4901+$8700,$FF00,$182,$933
+   Data $4901+$9100,$FF00,$180,$600
+   Data $4901+$9100,$FF00,$182,$A33
+   Data $4901+$9B00,$FF00,$180,$700
+   Data $4901+$9B00,$FF00,$182,$B33
+   Data $4901+$A500,$FF00,$180,$800
+   Data $4901+$A500,$FF00,$182,$C33
+' Mirroring  
+   Data $108,-40*6
+
+   Data $4901+$AF00,$FF00,$180,$700
+   Data $4901+$AF00,$FF00,$182,$D33
+
+' More than 255 lines vertical 
+   Data $FFDF,$FFFE
+
+   Data $1,$FF00,$180,$600
+   Data $1,$FF00,$182,$E33
+   Data $801,$FF00,$180,$500
+   Data $801,$FF00,$182,$F33
+   Data $F01,$FF00,$180,$400
+   Data $F01,$FF00,$182,$F33
+   Data $1601,$FF00,$180,$300
+   Data $1601,$FF00,$182,$F33
+   Data $1D01,$FF00,$180,$100
+   Data $1D01,$FF00,$182,$F33
+
+CEND:
+   Data $FFFF,$FFFE

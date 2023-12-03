@@ -1,0 +1,55 @@
+' Agony castle - simple version
+
+Screen Open 0,320,256,2,0 : Flash Off : Curs Off : Hide On : Cls 0
+Load Iff "castle.iff"
+Wait Vbl 
+
+' set rainbow number,index_color,height,red$,green$,blue$
+' rainbow number,offset,vertical_position,height 
+
+' The rainbow 0 is put on the color index 1 (the castle itself)
+Set Rainbow 0,1,210,"","",""
+
+' read data value  
+' h is the height of each 'line' and c the color 
+' rain command allows to change 1 color line in a rainbow
+' 21 data couple entries 
+Restore RASTER
+For I=1 To 21
+   Read H,C
+   For J=1 To H
+      Rain(0,(J-1)+(I-1)*H)=C
+   Next 
+Next 
+
+' Display rainbow
+Rainbow 0,0,40,210
+
+
+Repeat 
+   Wait Vbl 
+Until Mouse Key=1
+
+RASTER:
+Data 10,$33
+Data 10,$133
+Data 10,$233
+Data 10,$333
+Data 10,$433
+Data 10,$533
+Data 10,$633
+Data 10,$733
+Data 10,$833
+Data 10,$933
+Data 10,$A33
+Data 10,$B33
+Data 10,$C33
+Data 10,$D33
+Data 10,$E33
+Data 10,$F33
+Data 10,$F43
+Data 10,$F53
+Data 10,$F54
+Data 10,$F64
+Data 10,$F74
+

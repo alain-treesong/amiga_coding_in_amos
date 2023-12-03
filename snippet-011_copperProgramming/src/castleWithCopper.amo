@@ -1,0 +1,83 @@
+' Amos with copper direct use  
+' Agony background castle with mirroring 
+'
+' Aghnar/Agima 12/2023 
+
+' Define an Amos screen
+Screen Open 0,320,256,2,0 : Flash Off : Curs Off : Hide On : Cls 0
+Screen Hide 0 : Wait Vbl 
+Load Iff "castle.iff"
+Wait Vbl 
+
+' Save the one bitplane allocation associated to the Amos screen 0 
+' Set bitplane data in $dff0E0 and $dff0E2 bitplane 0 register 
+BPL0HW=Logbase(0)/$FFFF
+BPL0LW=Logbase(0) and $FFFF
+
+
+' Prepare own copperlist 
+' ---------------------- 
+' Allocation of 1k chip memory that must begin at an even address
+Reserve As Chip Work 10,1024
+CL0=Start(10)
+If(CL0 and 1)=1 Then Add CL0,1
+CL=CL0
+Restore COPPER_LIST
+Repeat 
+   Read A,B
+   Doke CL,A : Add CL,2
+   Doke CL,B : Add CL,2
+Until A=$FFFF and B=$FFFE
+
+' Start own copper list
+' ---------------------
+'
+Wait Vbl 
+' To avoid some bitplane glich, registers of bitplane are fetch with the 68K 
+Doke $DFF0E0,BPL0HW
+Data $DFF0E2,BPL0LW
+Copper Off 
+
+' Install dma value
+Wait Vbl 
+Doke $DFF096,$7FFF
+Doke $DFF096,$83C0 : Rem $83C0 = %1000 0011 1000 0000 enables bitplane and copper dma 
+
+' set our own copperlist 
+Loke $DFF080,CL0
+Doke $DFF088,1
+
+Repeat 
+   Wait Vbl 
+Until Mouse Key=1
+
+' Come back to Amos system 
+' ------------------------ 
+Wait Vbl 
+Doke $DFF096,$7FFF
+Doke $DFF096,$83F0
+Wait Vbl 
+Copper On 
+End 
+
+' The copper list
+' ---------------
+COPPER_LIST:
+   Data $1FC,$0
+   Data $100,$1200
+   Data $102,$0
+   Data $108,$0
+   Data $10A,$0
+_SCREEN_DISPLAY:
+   Data $8E,$2C81
+   Data $90,$2CC1
+   Data $92,$38
+   Data $94,$D0
+BIPLANE_PTR:
+   Data $E0,BPL0HW
+   Data $E2,BPL0LW
+_COLOR:
+   Data $180,$0
+   Data $182,$FFF
+CEND:
+   Data $FFFF,$FFFE
