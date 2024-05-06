@@ -1,0 +1,45 @@
+' How to check joystick buttons 2 and 3
+' Inspired by an article by Photon / Scoopex 
+' http://coppershade.org/articles/More!/Topics/Support_3_Buttons_in_Amiga_Games!/
+'
+' Aghnar / Agima 2024  
+
+' Hardware registers 
+POTGO=$DFF034
+POTGOR=$DFF016
+
+' POTGOR allows to test second or third button 
+' Port 1 : second player (usual mouse port)  
+'  bits 10 = 0 means that button 2 is pressed    
+'  bits 8 = 0 means that button 3 is pressed   
+' Port 2 : first player
+'  bits 14 = 0 means that button 2 is pressed    
+'  bits 12 = 0 means that button 3 is pressed  
+
+' Before each read of POTGOR, POTGO has to been set with $FF00 
+' At least 300 micro seconds before. The simple practice 
+' is to init it before and then after each read in the main loop     
+
+Print "Test button 2 and button 3 of joystick in port 1"
+
+' Init 
+' before each POTGOR read, we have to set some bits of POTGO 
+Doke POTGO,$FF00
+STICK=0
+Wait Vbl 
+
+Repeat 
+
+   STICK=Deek(POTGOR)
+
+   ' Test bit 14
+   If(STICK and 16384)=0 Then Print "button 2 port 1 is pressed"
+   ' Test bit 12
+   If(STICK and 4096)=0 Then Print "button 3 port 1 is pressed"
+
+   ' mask POTGO 
+   Doke POTGO,$FF00
+
+   Wait Vbl 
+
+Until Mouse Key=1
