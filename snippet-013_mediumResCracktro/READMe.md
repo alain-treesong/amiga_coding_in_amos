@@ -6,6 +6,7 @@ The code in this little production is commented and uses elements that have been
 This post will therefore only focus on the original points.
 
 But first, here's what it looks like:
+
 ![Classical Amiga Joysticks](readImg/mediumRes.png)
 
 A video is available here: https://youtu.be/yH8yDvl_kDQ
@@ -93,6 +94,7 @@ However, we can note that the animation of the squares is in 25 fps while the re
 It can be applied to bobs (in 25 fps) while sprites are in 50 fps.
 
 Many demos and games use this technique in order to have smooth scrolling and sprites in 50 fps and bobs in 25. For example the excellent Alien Breed / Team 17 1991 uses this technique:
+
 ![Aliens in 25 fps, scroll in 50](readImg/alienB.png)
 
 
