@@ -1,0 +1,258 @@
+' Medium resolution
+' A little 43k A500 intro  
+' Aghnar / Agima 2024.7.14   
+Set Buffer 20
+Close Editor 
+
+
+' Init 
+' ---------- 
+Screen Open 0,640,32,2,$8000
+Flash Off : Curs Off : Hide 
+Palette $0,$0,$0,$0
+Paper 0 : Cls 
+
+' font and text    
+Global ALPHA$
+ALPHA$="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&'(!)-_$:.,;*/\| "
+
+CREATE_FONT_TXT
+Procedure CREATE_FONT_TXT
+
+   ' 8x8 font 4 colors based on topaz as an icon bank 
+   Ink 1 : Pen 1
+   For I=1 To Len(ALPHA$)
+      Locate 0,0 : Print Mid$(ALPHA$,I,1)
+      Get Icon I,0,0 To 8,8
+   Next 
+
+   ' text message as a data bank  
+   TXT$=""
+   TXT$=TXT$+"It's been a while since Agima released a small production for the Amiga 500, but today it's done with this"
+   TXT$=TXT$+" little 'cracktro like' in medium resolution. Coded by Aghnar and music by Mantronix/Fairlight (thx). The sources"
+   TXT$=TXT$+" for this little prod are available here: https://github.com/alain-treesong/amiga_coding_in_amos repository."
+   TXT$=TXT$+" Yes, you're not dreaming, it's coded in Amos and yet it's smooth on A500. "
+   TXT$=TXT$+" Hey guys, all you had to do was read the manual... "
+   TXT$=TXT$+" I have just finally finished 'LOTUS TURBO ESPRIT 1' by Gremlin Graphics / Magnetic Fields 1990 on my Amiga 500 with my original restored by my friend Ixien."
+   TXT$=TXT$+" It was important to point out :-). And now the text starts again from the beginning............................................"
+
+   ' id of letters are resolved in a bank to avoid this slow computation
+   ' in the main loop 
+   Reserve As Work 6,Len(TXT$)
+   S=Start(6)
+   For I=1 To Len(TXT$)
+      Poke S+(I-1),Instr(ALPHA$,Mid$(TXT$,I,1))
+   Next 
+
+End Proc
+
+' Rotating squares var 
+Dim C(1024),S(1024)
+Global C(),S()
+Global CX,CY,ANG,ANG2,FPS
+Global XE0,YE0,XE1,YE1,XE2,YE2,XE3,YE3,XE4,YE4,XE5,YE5
+Global XE6,YE6,XE7,YE7
+
+Degree 
+For I=0 To 1023
+   C(I)=Qcos(I,96) : S(I)=Qsin(I,96)
+Next I
+
+ANG=0
+CX=320 : CY=128
+
+' Load music that will be saved in the main code as a bank 
+'Track Load "assets/fairlight7.mod",10 
+
+' Screens : mainly a medium resolution full pal screen of 8 colors   
+' with a 16 pixel height medium screen for scroll txt in the bottom
+Screen Open 0,640,256,8,$8000
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Palette $0,$0,$0,$0,$0,$0,$0,$0
+Wait Vbl 
+
+Screen Open 1,640+32,16,2,$8000
+Screen Display 1,128,238,640,16
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+
+' Build ascii logo 
+Screen 0
+Ink 1 : Pen 1
+
+Locate 14,6 : Print "    _____     ________ .___    _____      _____"
+Locate 14,7 : Print "   /  _  \   /  _____/ |   |  /     \    /  _  \"
+Locate 14,8 : Print "  /  /_\  \ /   \  ___ |   | /  \ /  \  /  /_\  \"
+Locate 14,9 : Print " /    |    \\    \_\  \|   |/    Y    \/    |    \"
+Locate 14,10 : Print " \____|__  / \______  /|___|\____|__  /\____|__  /"
+Locate 14,11 : Print "-------- \/-------- \/------------- \/-------- \/--"
+Locate 0,14 : Centre "A.G.I.M.A  PRESENTS"
+Locate 0,16 : Centre "MEDIUM RESOLUTION"
+Locate 0,17 : Centre "-=-=-=-=-=-=-=-=-"
+
+Double Buffer : Autoback 0
+Wait Vbl 
+
+' Disable system 
+F=Execall(-132) : Wait Vbl 
+
+
+' The scene  
+' ---------- 
+'T=0 
+'Timer=0 
+
+' var for scroll text
+DROP=-1
+ITXT=0
+S=Start(6)
+L=Length(6)-1
+
+' All appears
+Pt Play 10
+Screen 1 : Palette $14,$EEE,$0,$EEE
+Screen 0 : Fade 1,$125,$FFF,$24A,$ACF,$35B,$CEF,$46C,$DFF
+For I=1 To 15
+   SQUARES
+   Wait Vbl 
+Next 
+
+' and runs 
+Do 
+
+   ' Scroll text  
+   ' Simple left offset of 1 pixel with the blitter (screen copy) 
+   Add DROP,1
+   DROP=DROP and 7
+   If DROP=0
+      IC=Peek(S+ITXT)
+      Add ITXT,1,0 To L
+      Screen 1 : Paste Icon 640,4,IC : Screen 0
+   End If 
+   Screen Copy 1,1,3,648,12 To 1,0,3
+
+   '
+   SQUARES
+
+   ' Compute fps
+   'Add T,1   
+   'If T=10 : Locate 1,0 : Print 500/Timer;" fps" : Timer=0 : T=0 : End If    
+
+   Wait Vbl 
+
+   ' Mouse key even if os is disabled 
+   If Btst(6,$BFE001)=0 Then Exit 
+
+Loop 
+
+
+' The end
+' ---------- 
+Screen Close 1
+Screen 0 : Fade 1
+For I=1 To 31
+   Pt Volume 64-I*2
+   Wait Vbl 
+Next 
+Pt Stop 
+' enable system
+F=Execall(-138) : Wait Vbl 
+Erase 10 : Erase 6 : Wait Vbl 
+Screen Close 0 : Wait Vbl 
+End 
+
+
+Procedure SQUARES
+
+   ' Definition of the square 
+   'X0=-1 : Y0=1
+   'X1=1 : Y1=1 
+   'X2=1 : Y2=-1
+   'X3=-1 : Y3=-1 
+
+   ' Each point is rotated and projected
+   ' Example point 0: 
+   'XE0=X0*CA-Y0*SA 
+   'YE0=X0*SA+Y0*CA 
+   'XE0=CX+XE0
+   'YE0=CY+YE0/2
+
+   ' As u can see, with value of x0 and y0
+   ' it can be simplified to :
+   'XE0=-CA-SA  
+   'YE0=-SA+CA  
+   'XE0=CX+XE0
+   'YE0=CY+YE0/2
+
+   ' and finally: 
+   'XE0=-CA-SA+CX 
+   'YE0=(-SA+CA)/2+CY 
+
+   ' we do it for each point
+
+   If FPS=0
+
+      Blitter Clear 0,1,160,60 To 464,200
+      Blitter Clear 0,2,160,60 To 464,200
+
+      ' first square 
+      Add ANG,2
+      ANG=ANG and 1023
+
+      CA=C(ANG)
+      SA=S(ANG)
+
+      XE0=CX-CA-SA
+      YE0=CY+(CA-SA)/2
+   
+      XE1=CX+CA-SA
+      YE1=CY+(SA+CA)/2
+
+      XE2=CX+CA+SA
+      YE2=CY+(SA-CA)/2
+
+      XE3=CX-CA+SA
+      YE3=CY-(CA+SA)/2
+
+      Turbo Draw XE0,YE0 To XE1,YE1,2,-2
+      Turbo Draw XE1,YE1 To XE2,YE2,2,-2
+      Turbo Draw XE2,YE2 To XE3,YE3,2,-2
+      Turbo Draw XE3,YE3 To XE0,YE0,2,-2
+
+   Else 
+
+      ' second square
+
+      ANG2=ANG+128
+      'If ANG2>1023 : Add ANG2,-1024 : End If replaced by
+      ANG2=ANG2 and 1023
+
+      CA2=C(ANG2)
+      SA2=S(ANG2)
+
+      XE4=CX-CA2-SA2
+      YE4=CY+(CA2-SA2)/2
+   
+      XE5=CX+CA2-SA2
+      YE5=CY+(SA2+CA2)/2
+
+      XE6=CX+CA2+SA2
+      YE6=CY+(SA2-CA2)/2
+
+      XE7=CX-CA2+SA2
+      YE7=CY-(CA2+SA2)/2
+
+      Turbo Draw XE4,YE4 To XE5,YE5,4,-4
+      Turbo Draw XE5,YE5 To XE6,YE6,4,-4
+      Turbo Draw XE6,YE6 To XE7,YE7,4,-4
+      Turbo Draw XE7,YE7 To XE4,YE4,4,-4
+
+      Blitter Fill 0,1,160,60,464,200
+      Blitter Fill 0,2,160,60,464,200
+
+      Screen Swap 
+
+   End If 
+
+   FPS=1-FPS
+   
+End Proc
