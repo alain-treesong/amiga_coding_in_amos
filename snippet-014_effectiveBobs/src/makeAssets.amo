@@ -1,0 +1,18 @@
+' Create bobs bank for effective bobs example
+' Bisons from SOTB 3 
+' Aghnar / Agima 2025
+
+Screen Open 0,320,258,8,0
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Load Iff "assets/beteFrames.iff"
+
+For I=0 To 3
+Get Bob I+1,I*80,0 To I*80+80,60
+Next 
+
+Cls 0
+
+Wait Vbl 
+
+Save "assets/bobs.abk"
+

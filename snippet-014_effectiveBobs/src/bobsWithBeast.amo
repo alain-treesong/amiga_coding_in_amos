@@ -1,0 +1,106 @@
+' Running beasts 
+' Effective bobs in action 
+' Aghnar / Agima august 2025 
+
+
+' Dual playflied 
+'
+Screen Open 0,640,200,8,0
+Screen Display 0,128,68,320,200
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Load Iff "assets/backCloudNTSC.iff"
+Screen Copy 0,0,0,320,200 To 0,320,0
+Wait Vbl 
+
+Screen Open 1,320,200,8,0
+Screen Display 1,128,68,320,200
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Wait Vbl 
+
+Dual Playfield 1,0
+Wait Vbl 
+
+Double Buffer 
+
+' Loading of the bobs bank created by makeAssets.amos
+Load "assets/bobs.abk"
+Get Sprite Palette 
+
+' Colors for back field  
+Palette $0,,,,,,,,0,$262,$372,$383,$AAC,$BBC,$CCC,$6F
+
+'P=Execall(-132) 
+Wait Vbl 
+
+
+' It is an Amiga scene, not an Atari, so here is 
+' a nice raster for the sky
+Set Rainbow 1,7+8,30,"","",""
+
+Rain(1,0)=$6F
+Rain(1,1)=$16F
+Rain(1,2)=$16F
+Rain(1,3)=$26F
+Rain(1,4)=$27F
+Rain(1,5)=$37F
+Rain(1,6)=$38F
+Rain(1,7)=$48F
+Rain(1,8)=$49F
+Rain(1,9)=$59F
+Rain(1,10)=$6AF
+Rain(1,11)=$6AF
+Rain(1,12)=$7BF
+Rain(1,13)=$8BF
+Rain(1,14)=$8CF
+Rain(1,15)=$9CF
+Rain(1,16)=$ADF
+Rain(1,17)=$BDF
+Rain(1,18)=$CEF
+Rain(1,19)=$DEF
+For I=1 To 10
+   Rain(1,19+I)=$EEE
+Next 
+Rainbow 1,0,180,30
+
+
+' Bobs init
+' Animation (frames and moves) is done with AMAL 
+
+Set Bob 0,1,,
+Set Bob 1,1,,
+'Set Bob 2,1,, 
+
+'Bob 2,100,130,1 
+'Channel 2 To Bob 2
+'Amal 2,"A 0,(1,6)(2,6)(3,6)(4,6)" 
+
+Bob 1,70,125,1
+Channel 1 To Bob 1
+Amal 1,"A 0,(3,6)(4,6)(1,5)(2,6); S: M 0,0,400; M 130,0,130; M 0,0,50; M -130,0,130; J S"
+
+Bob 0,150,120,1
+Channel 0 To Bob 0
+Amal 0,"A 0,(2,6)(3,6)(4,6)(1,5)"
+
+Amal On 
+
+' For the fps count
+T=0
+Timer=0
+Screen Open 2,320,16,2,0 : Curs Off : Flash Off 
+
+' Main loop
+' FPS and Scroll. Animation of bobs are under interruption 
+Do 
+
+   Add T,1
+   If T=10 Then Locate 1,0 : Print 500/Timer;" FPS " : T=0 : Timer=0
+
+   ' Scrolling
+   Add X,4,0 To 320
+   Screen Offset 0,X,0
+   Wait Vbl 
+
+Loop 
+
+

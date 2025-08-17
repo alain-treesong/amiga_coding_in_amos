@@ -1,0 +1,62 @@
+' Simple Bobs example
+'  
+' Aghnar / Agima 2025
+
+' Opening a screen of 320x200, 8 colors
+Screen Open 0,320,200,8,0
+'Screen Display 0,128,68,320,200 
+Flash Off : Curs Off : Hide : Paper 0 : Cls 
+Double Buffer 
+
+' Load the beasts frames 
+Load "assets/bobs.abk"
+Get Sprite Palette 
+Colour 0,$F
+
+' Disable background rendering for bobs d'id 0 to 4
+Set Bob 0,1,,
+Set Bob 1,1,,
+Set Bob 2,1,,
+Set Bob 3,1,,
+Set Bob 4,1,,
+
+' Initializing 5 bobs
+Bob 4,20,132,1
+Channel 4 To Bob 4
+Amal 4,"A 0,(4,6)(1,5)(2,6)(3,6)"
+
+Bob 3,190,135,1
+Channel 3 To Bob 3
+Amal 3,"A 0,(4,6)(1,5)(2,6)(3,6); S: M 0,0,200; M 20,0,20; M 0,0,100; M -20,0,80; M 0,0,150; J S"
+
+Bob 2,100,130,1
+Channel 2 To Bob 2
+Amal 2,"A 0,(1,5)(2,6)(3,6)(4,6)"
+
+Bob 1,70,125,1
+Channel 1 To Bob 1
+Amal 1,"A 0,(3,6)(4,6)(1,5)(2,6); S: M 0,0,400; M 130,0,130; M 0,0,150; M -130,0,260; J S"
+
+Bob 0,150,120,1
+Channel 0 To Bob 0
+Amal 0,"A 0,(2,6)(3,6)(4,6)(1,5)"
+
+Amal On 
+
+
+' Var for FPS measure
+T=0
+Timer=0
+Screen Open 1,320,16,2,0
+Curs Off : Flash Off 
+
+
+' Main loop : actually it is unuseful for the animation that 
+' is under interruption but it allows to measures the frame rate 
+Do 
+   Add T,1
+   If T=10 Then Locate 1,0 : Print 500/Timer;" FPS " : T=0 : Timer=0
+   Wait Vbl 
+Loop 
+
+
