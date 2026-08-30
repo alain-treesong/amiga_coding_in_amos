@@ -1,0 +1,154 @@
+Set Buffer 16
+
+' Spiral of infinite cubes   
+' Aghnar / Agima 2026
+
+' Trigo & coord
+Degree 
+Dim C(1024),S(1024)
+Global C(),S()
+For I=0 To 1023
+   C(I)=Qcos(I,256) : S(I)=Qsin(I,256)
+Next I
+
+' Path of the cubes
+Dim CX(511),CY(511),CZ(511)
+Dim CL(7)
+AX=0
+For I=0 To 511
+   CX(I)=160+(I*C(AX))/512
+   CY(I)=128+(I*S(AX))/512
+   CZ(I)=1024+(128*4096)/(I+1)
+   Add AX,8,0 To 1023
+Next 
+For I=0 To 7
+   CL(I)=I and 1
+Next 
+
+AX=0 : AY=0 : AZ=0
+
+'
+'
+For I=0 To 7
+   Screen Open I,320,256,4,Lowres
+   Palette $0,$59,$6A,$0
+   Paper 0 : Cls : Flash Off : Curs Off : Hide 
+Next 
+Wait Vbl 
+
+Timer=0
+T=0
+
+
+S=-1 : Rem index of the current screen
+
+BPL=0
+C=1
+
+I=0
+Do 
+
+   Add S,1,0 To 7
+   If I<512
+      CX=CX(I)
+      CY=CY(I)
+      CZ=CZ(I)
+
+      Screen S
+      CL(S)=1-CL(S)
+      C=1+CL(S)
+      Add AX,-4,0 To 1023
+      Add AY,-8,0 To 1023
+      Gosub RENDER_CUBE
+      Add I,1
+   End If 
+   'Add T,1 : If T=10 : Locate 1,1 : Print Timer;" " : Timer=0 : T=0 : End If 
+   Screen To Front S
+   Wait Vbl 
+Loop 
+
+RENDER_CUBE:
+
+   CAX=C(AX)
+   SAX=S(AX)
+   CAY=C(AY)
+   SIY=S(AY)
+   A=CAX+SAX
+   B=CAX-SAX
+   SIYA=A*SIY
+   CAYA=(A*CAY)/256
+   SIYB=B*SIY
+   CAYB=(B*CAY)/256
+   CAY256=CAY*256
+
+   'Data -1,-1,-1 
+   X0=-CAY256-SIYB
+   Y0=-A*256
+   Z0=SIY-CAYB
+   D=CZ+Z0
+   XE0=CX+X0/D
+   YE0=CY+Y0/D
+
+   ' Data 1,1,1 
+   D=CZ-Z0
+   XE1=CX-X0/D
+   YE1=CY-Y0/D
+
+   ' Data -1,-1,1   
+   X2=-CAY256+SIYA
+   Y2=-B*256
+   Z2=SIY+CAYA
+   '  
+   D=CZ+Z2
+   XE2=CX+X2/D
+   YE2=CY+Y2/D
+
+   'Data 1,1,-1 
+   D=CZ-Z2
+   XE3=CX-X2/D
+   YE3=CY-Y2/D
+
+   ' Data 1,-1,-1 
+   X4=CAY256-SIYB
+   Y4=Y0
+   Z4=-SIY-CAYB
+   D=CZ+Z4
+   XE4=CX+X4/D
+   YE4=CY+Y4/D
+
+   ' Data -1,1,1  
+   D=CZ-Z4
+   XE5=CX-X4/D
+   YE5=CY-Y4/D
+
+   'Data -1,1,-1
+   X6=-CAY256-SIYA
+   Y6=-Y2
+   Z6=SIY-CAYA
+   D=CZ+Z6
+   XE6=CX+X6/D
+   YE6=CY+Y6/D
+
+   'Data 1,-1,1 
+   D=CZ-Z6
+   XE7=CX-X6/D
+   YE7=CY-Y6/D
+
+   ' it seems the colour 3 is not correctly set by palette instr
+   ' we set it here 
+   Colour 3,$8BF
+
+   Turbo Draw XE1,YE1 To XE5,YE5,C,C
+   Turbo Draw XE5,YE5 To XE2,YE2,C,C
+   Turbo Draw XE2,YE2 To XE7,YE7,C,C
+   Turbo Draw XE7,YE7 To XE1,YE1,C,C
+   Turbo Draw XE1,YE1 To XE3,YE3,C,C
+   Turbo Draw XE5,YE5 To XE6,YE6,C,C
+   Turbo Draw XE2,YE2 To XE0,YE0,C,C
+   Turbo Draw XE7,YE7 To XE4,YE4,C,C
+   Turbo Draw XE0,YE0 To XE4,YE4,C,C
+   Turbo Draw XE4,YE4 To XE3,YE3,C,C
+   Turbo Draw XE3,YE3 To XE6,YE6,C,C
+   Turbo Draw XE6,YE6 To XE0,YE0,C,C
+
+Return 

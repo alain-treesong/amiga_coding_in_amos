@@ -1,0 +1,49 @@
+' First simple example of infinite bobs
+
+' Let's open 8 screens of 1 bitplanes in 320x256 
+' It costs 8*(320*256/8) = 8 * 10240 = 80 KB of chip memory  
+For I=0 To 7
+   Screen Open I,320,256,4,Lowres
+   Palette $0,$EEE
+   Paper 0 : Cls : Flash Off : Curs Off : Hide 
+Next 
+Wait Vbl 
+
+' The idea is to build cyclic conitnuous images  
+'
+' With this first simple example, we will draw NDB falling squares 
+
+' Init of the stars
+NDB=7
+Dim X(NDB),Y(NDB),SPEED(NDB)
+For I=0 To NDB
+   X(I)=32+Rnd(256)
+   Y(I)=-16
+   SPEED(I)=2+(I mod 3)
+Next 
+
+' A first square will fall during 8 frames, one frame per screen 
+' Then we will reset to the first screen but will continue to draw 
+' the falling square   
+' When the square reaches the end of the screen, the next square is
+' drawn from the top 
+' The final render can be built in a more esthetic way of course 
+
+S=-1 : Rem index of the current screen
+
+Ink 1
+For I=0 To NDB
+For J=0 To 255+16 Step SPEED(I)
+   Add S,1,0 To 7
+   Screen S
+   Box X(I),Y(I) To X(I)+7*(SPEED(I)-1),Y(I)+7*(SPEED(I)-1)
+   Add Y(I),SPEED(I)
+Next 
+Next 
+
+' Let's play the animation 
+Do 
+   Add S,1,0 To 7
+   Screen To Front S
+   Wait Vbl 
+Loop 
