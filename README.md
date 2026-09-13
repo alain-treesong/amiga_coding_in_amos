@@ -3,8 +3,10 @@
 This repository contains a set of code written in Amos Pro for tutorial purposes.
 
 Amos Pro is a powerful BASIC language specific to the AMIGA computer range.
-Amos is an extensible language and some extensions have become a de facto standard. You can download a version of Amos 2.x with AMCAF and Amos Turbo extensions here :
-https://www.dropbox.com/s/nch9p4fj59lw4k4/AMOSPro_Community_2020_1.adf?dl=0
+
+Amos is an extensible language and some extensions have become a de facto standard. You can download a version of Amos 2.x with AMCAF and Amos Turbo extensions in the AmosDistribution folder :
+https://github.com/alain-treesong/amiga_coding_in_amos/tree/main/amosDistribution/AmosPro2.ADF
+
 All the code examples in the repository assume that these two extensions are installed.
 
 Unless otherwise stated, the repository programs are written for a (almost) vanilla Amga 500 with 512KB of chip memory and 512KB of memory.
